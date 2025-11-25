@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { PixelGraph } from "@pixel-graph/react";
+import { PixelGraph } from "pixel-graph-react";
 
 const meta: Meta<typeof PixelGraph> = {
   title: "Example/PixelGraph",
@@ -9,14 +9,6 @@ const meta: Meta<typeof PixelGraph> = {
   },
   tags: ["autodocs"],
   argTypes: {
-    color1: {
-      control: "color",
-      description: "Color for the first data series (New Users)",
-    },
-    color2: {
-      control: "color",
-      description: "Color for the second data series (Existing Users)",
-    },
     pixelSize: {
       control: { type: "range", min: 1, max: 20, step: 1 },
       description: "Size of each pixel square (1-20px)",
@@ -25,6 +17,22 @@ const meta: Meta<typeof PixelGraph> = {
       control: { type: "range", min: 0, max: 10, step: 1 },
       description: "Gap between pixels (0-10px)",
     },
+    showLegend: {
+      control: "boolean",
+      description: "Show/hide legend",
+    },
+    showTimeRange: {
+      control: "boolean",
+      description: "Show/hide time range selector",
+    },
+    title: {
+      control: "text",
+      description: "Chart title",
+    },
+    subtitle: {
+      control: "text",
+      description: "Chart subtitle",
+    },
   },
 };
 
@@ -32,26 +40,42 @@ export default meta;
 type Story = StoryObj<typeof PixelGraph>;
 
 const mockData = [
-  { name: "JAN", value1: 40, value2: 24 },
-  { name: "FEB", value1: 30, value2: 13 },
-  { name: "MAR", value1: 20, value2: 58 },
-  { name: "APR", value1: 27, value2: 39 },
-  { name: "MAY", value1: 18, value2: 48 },
-  { name: "JUN", value1: 23, value2: 38 },
-  { name: "JUL", value1: 34, value2: 43 },
-  { name: "AUG", value1: 40, value2: 24 },
-  { name: "SEP", value1: 30, value2: 13 },
-  { name: "OCT", value1: 20, value2: 58 },
-  { name: "NOV", value1: 27, value2: 39 },
-  { name: "DEC", value1: 18, value2: 48 },
+  { name: "JAN", newUsers: 40, existingUsers: 24, premium: 15 },
+  { name: "FEB", newUsers: 30, existingUsers: 13, premium: 20 },
+  { name: "MAR", newUsers: 20, existingUsers: 58, premium: 25 },
+  { name: "APR", newUsers: 27, existingUsers: 39, premium: 18 },
+  { name: "MAY", newUsers: 18, existingUsers: 48, premium: 22 },
+  { name: "JUN", newUsers: 23, existingUsers: 38, premium: 28 },
+  { name: "JUL", newUsers: 34, existingUsers: 43, premium: 30 },
+  { name: "AUG", newUsers: 40, existingUsers: 24, premium: 25 },
+  { name: "SEP", newUsers: 30, existingUsers: 13, premium: 20 },
+  { name: "OCT", newUsers: 20, existingUsers: 58, premium: 35 },
+  { name: "NOV", newUsers: 27, existingUsers: 39, premium: 28 },
+  { name: "DEC", newUsers: 18, existingUsers: 48, premium: 32 },
 ];
 
 export const Default: Story = {
   args: {
     data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#d1d5db" },
+      { key: "existingUsers", label: "Existing Users", color: "#000000" },
+    ],
     className: "w-[1000px]",
-    color1: "#d1d5db",
-    color2: "#000000",
+    pixelSize: 4,
+    gap: 1,
+  },
+};
+
+export const ThreeSeries: Story = {
+  args: {
+    data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#93c5fd" },
+      { key: "existingUsers", label: "Existing Users", color: "#3b82f6" },
+      { key: "premium", label: "Premium", color: "#1e40af" },
+    ],
+    className: "w-[1000px]",
     pixelSize: 4,
     gap: 1,
   },
@@ -60,31 +84,25 @@ export const Default: Story = {
 export const LargePixels: Story = {
   args: {
     data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#d1d5db" },
+      { key: "existingUsers", label: "Existing Users", color: "#000000" },
+    ],
     className: "w-[1000px]",
-    color1: "#d1d5db",
-    color2: "#000000",
-    pixelSize: 6,
+    pixelSize: 8,
     gap: 2,
-  },
-};
-
-export const ColorfulTheme: Story = {
-  args: {
-    data: mockData,
-    className: "w-[1000px]",
-    color1: "#93c5fd",
-    color2: "#3b82f6",
-    pixelSize: 4,
-    gap: 1,
   },
 };
 
 export const PurpleTheme: Story = {
   args: {
     data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#e9d5ff" },
+      { key: "existingUsers", label: "Existing Users", color: "#a855f7" },
+      { key: "premium", label: "Premium", color: "#7c3aed" },
+    ],
     className: "w-[1000px]",
-    color1: "#e9d5ff",
-    color2: "#a855f7",
     pixelSize: 4,
     gap: 1,
   },
@@ -93,9 +111,11 @@ export const PurpleTheme: Story = {
 export const GreenTheme: Story = {
   args: {
     data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#bbf7d0" },
+      { key: "existingUsers", label: "Existing Users", color: "#22c55e" },
+    ],
     className: "w-[1000px]",
-    color1: "#bbf7d0",
-    color2: "#22c55e",
     pixelSize: 4,
     gap: 1,
   },
@@ -104,10 +124,41 @@ export const GreenTheme: Story = {
 export const TinyPixels: Story = {
   args: {
     data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#fecaca" },
+      { key: "existingUsers", label: "Existing Users", color: "#ef4444" },
+    ],
     className: "w-[1000px]",
-    color1: "#fecaca",
-    color2: "#ef4444",
-    pixelSize: 3,
+    pixelSize: 2,
+    gap: 0,
+  },
+};
+
+export const NoLegend: Story = {
+  args: {
+    data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#93c5fd" },
+      { key: "existingUsers", label: "Existing Users", color: "#3b82f6" },
+    ],
+    className: "w-[1000px]",
+    pixelSize: 4,
     gap: 1,
+    showLegend: false,
+  },
+};
+
+export const CustomTitles: Story = {
+  args: {
+    data: mockData,
+    series: [
+      { key: "newUsers", label: "New Users", color: "#93c5fd" },
+      { key: "existingUsers", label: "Existing Users", color: "#3b82f6" },
+    ],
+    className: "w-[1000px]",
+    pixelSize: 4,
+    gap: 1,
+    title: "User Growth",
+    subtitle: "Monthly Active Users: 125,430",
   },
 };

@@ -17,7 +17,7 @@ importers:
 
   apps/storybook:
     dependencies:
-      '@pixel-graph/react':
+      pixel-graph-react:
         specifier: workspace:*
         version: link:../../packages/pixel-graph
       react:
@@ -57,9 +57,6 @@ importers:
 
   apps/www:
     dependencies:
-      '@pixel-graph/react':
-        specifier: workspace:*
-        version: link:../../packages/pixel-graph
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
@@ -69,6 +66,9 @@ importers:
       next:
         specifier: 14.1.0
         version: 14.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      pixel-graph-react:
+        specifier: workspace:*
+        version: link:../../packages/pixel-graph
       react:
         specifier: ^18
         version: 18.3.1

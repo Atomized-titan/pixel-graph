@@ -3,34 +3,47 @@
 import { useState } from "react";
 import { cn } from "./utils";
 
-export interface PixelGraphProps {
-  data: Array<{
-    name: string;
-    value1: number;
-    value2: number;
-  }>;
-  className?: string;
-  color1?: string;
-  color2?: string;
-  pixelSize?: number;
-  gap?: number;
+export interface DataPoint {
+  name: string;
+  [key: string]: string | number;
 }
 
-const CustomTooltip = ({ active, payload, label, color1, color2 }: any) => {
+export interface SeriesConfig {
+  key: string;
+  label: string;
+  color: string;
+}
+
+export interface PixelGraphProps {
+  data: DataPoint[];
+  series: SeriesConfig[];
+  className?: string;
+  pixelSize?: number;
+  gap?: number;
+  showLegend?: boolean;
+  showTimeRange?: boolean;
+  title?: string;
+  subtitle?: string;
+}
+
+const CustomTooltip = ({ active, payload, label, series }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-sm">
-        <p className="font-medium text-gray-500 mb-2">{label} 2025</p>
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color1 }} />
-          <span className="text-gray-500">New User</span>
-          <span className="font-semibold">{payload[0]?.value}k</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color2 }} />
-          <span className="text-gray-500">Existing User</span>
-          <span className="font-semibold">{payload[1]?.value}k</span>
-        </div>
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 text-sm">
+        <p className="font-medium text-gray-500 dark:text-gray-400 mb-2">{label}</p>
+        {payload.map((entry: any, index: number) => {
+          const seriesConfig = series.find((s: SeriesConfig) => s.key === entry.dataKey);
+          return (
+            <div key={index} className="flex items-center gap-2 mb-1 last:mb-0">
+              <div 
+                className="w-2 h-2 rounded-full" 
+                style={{ backgroundColor: seriesConfig?.color || entry.color }} 
+              />
+              <span className="text-gray-500 dark:text-gray-400">{seriesConfig?.label || entry.dataKey}</span>
+              <span className="font-semibold dark:text-white">{entry.value}k</span>
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -39,11 +52,14 @@ const CustomTooltip = ({ active, payload, label, color1, color2 }: any) => {
 
 export function PixelGraph({ 
   data, 
+  series,
   className,
-  color1 = "#d1d5db",
-  color2 = "#000000",
   pixelSize = 4,
   gap = 1,
+  showLegend = true,
+  showTimeRange = true,
+  title = "Sales Trend",
+  subtitle = "Total Revenue : $20,320",
 }: PixelGraphProps) {
   const [timeRange, setTimeRange] = useState("Monthly");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -56,7 +72,9 @@ export function PixelGraph({
   const graphHeight = chartHeight - padding.top - padding.bottom;
 
   // Find max value for scaling
-  const maxValue = Math.max(...data.map(d => d.value1 + d.value2));
+  const maxValue = Math.max(...data.map(d => {
+    return series.reduce((sum, s) => sum + (Number(d[s.key]) || 0), 0);
+  }));
   const yScale = graphHeight / maxValue;
 
   // Generate continuous pixel pattern with better interpolation
@@ -75,20 +93,39 @@ export function PixelGraph({
       // Smooth interpolation
       const smoothT = t * t * (3 - 2 * t); // Smoothstep
       
-      const value1 = data[dataIndex].value1 + (data[nextIndex].value1 - data[dataIndex].value1) * smoothT;
-      const value2 = data[dataIndex].value2 + (data[nextIndex].value2 - data[dataIndex].value2) * smoothT;
+      // Calculate interpolated values for each series
+      const seriesValues = series.map(s => {
+        const currentValue = Number(data[dataIndex][s.key]) || 0;
+        const nextValue = Number(data[nextIndex][s.key]) || 0;
+        return currentValue + (nextValue - currentValue) * smoothT;
+      });
       
-      const totalHeight = (value1 + value2) * yScale;
-      const value1Height = value1 * yScale;
+      // Calculate cumulative heights
+      const cumulativeHeights = seriesValues.reduce((acc, val, idx) => {
+        const prevHeight = idx > 0 ? acc[idx - 1] : 0;
+        acc.push(prevHeight + val * yScale);
+        return acc;
+      }, [] as number[]);
       
+      const totalHeight = cumulativeHeights[cumulativeHeights.length - 1] || 0;
       const totalRows = Math.floor(totalHeight / pixelWithGap);
-      const value1Rows = Math.floor(value1Height / pixelWithGap);
       
       for (let row = 0; row < totalRows; row++) {
+        const pixelHeight = row * pixelWithGap;
+        
+        // Determine which series this pixel belongs to
+        let seriesIndex = 0;
+        for (let i = 0; i < cumulativeHeights.length; i++) {
+          if (pixelHeight < cumulativeHeights[i]) {
+            seriesIndex = i;
+            break;
+          }
+        }
+        
         pixels.push({
           x: padding.left + col * pixelWithGap,
           y: padding.top + graphHeight - (row + 1) * pixelWithGap,
-          color: row < value1Rows ? color1 : color2
+          color: series[seriesIndex]?.color || '#000000'
         });
       }
     }
@@ -100,11 +137,11 @@ export function PixelGraph({
   const xStep = graphWidth / (data.length - 1);
 
   return (
-    <div className={cn("w-full bg-white p-6 rounded-3xl shadow-sm border border-gray-100", className)}>
+    <div className={cn("w-full bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800", className)}>
       <div className="flex justify-between items-start mb-8">
         <div>
-          <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
-            <span>SALES TREND</span>
+          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-1">
+            <span className="uppercase tracking-wide">{title}</span>
             <svg
               width="14"
               height="14"
@@ -121,40 +158,42 @@ export function PixelGraph({
             </svg>
           </div>
           <div className="flex items-baseline gap-4">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Total Revenue : <span className="ml-2">$20,320</span>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {subtitle}
             </h2>
-            <div className="flex gap-4 text-xs font-medium text-gray-500">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color1 }} />
-                NEW USER
+            {showLegend && (
+              <div className="flex gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+                {series.map((s, idx) => (
+                  <div key={idx} className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
+                    <span className="uppercase tracking-wide">{s.label}</span>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color2 }} />
-                EXISTING USER
-              </div>
-            </div>
+            )}
           </div>
         </div>
-        <div className="flex bg-gray-100 p-1 rounded-full text-xs font-medium">
-          {["Weekly", "Monthly", "Yearly"].map((range) => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={cn(
-                "px-4 py-1.5 rounded-full transition-all",
-                timeRange === range
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              )}
-            >
-              {range}
-            </button>
-          ))}
-        </div>
+        {showTimeRange && (
+          <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-full text-xs font-medium">
+            {["Weekly", "Monthly", "Yearly"].map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={cn(
+                  "px-4 py-1.5 rounded-full transition-all",
+                  timeRange === range
+                    ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                )}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="h-[400px] w-full relative overflow-hidden bg-gray-50">
+      <div className="h-[400px] w-full relative overflow-hidden bg-gray-50 dark:bg-gray-950/50 rounded-xl">
         <svg width="100%" height="100%" viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
           {/* Y-axis labels */}
           {[0, 20, 40, 60, 80].map((tick) => (
@@ -164,7 +203,8 @@ export function PixelGraph({
                 y={padding.top + graphHeight - (tick / 80 * graphHeight)}
                 textAnchor="end"
                 fontSize="12"
-                fill="#9ca3af"
+                fill="currentColor"
+                className="fill-gray-400 dark:fill-gray-500"
               >
                 {tick}k
               </text>
@@ -173,7 +213,8 @@ export function PixelGraph({
                 y1={padding.top + graphHeight - (tick / 80 * graphHeight)}
                 x2={chartWidth - padding.right}
                 y2={padding.top + graphHeight - (tick / 80 * graphHeight)}
-                stroke="#e5e7eb"
+                stroke="currentColor"
+                className="stroke-gray-200 dark:stroke-gray-800"
                 strokeWidth="1"
               />
             </g>
@@ -199,7 +240,8 @@ export function PixelGraph({
               y={chartHeight - 10}
               textAnchor="middle"
               fontSize="12"
-              fill="#9ca3af"
+              fill="currentColor"
+              className="fill-gray-400 dark:fill-gray-500"
             >
               {item.name}
             </text>
@@ -230,26 +272,27 @@ export function PixelGraph({
                       y1={padding.top}
                       x2={x}
                       y2={padding.top + graphHeight}
-                      stroke="#000"
+                      stroke="currentColor"
+                      className="stroke-gray-400 dark:stroke-gray-600"
                       strokeWidth="1"
                       strokeDasharray="4 4"
-                      opacity="0.3"
+                      opacity="0.5"
                     />
                     <foreignObject
                       x={Math.min(x - 100, chartWidth - 220)}
                       y={padding.top - 10}
                       width="200"
-                      height="100"
+                      height="150"
                     >
                       <CustomTooltip
                         active={true}
-                        payload={[
-                          { value: item.value1 },
-                          { value: item.value2 }
-                        ]}
+                        payload={series.map(s => ({
+                          dataKey: s.key,
+                          value: item[s.key],
+                          color: s.color
+                        }))}
                         label={item.name}
-                        color1={color1}
-                        color2={color2}
+                        series={series}
                       />
                     </foreignObject>
                   </>
