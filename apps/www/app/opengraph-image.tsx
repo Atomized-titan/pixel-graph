@@ -31,7 +31,7 @@ export default async function Image() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            padding: '60px 80px 40px 80px',
+            padding: '60px 80px 20px 80px',
           }}
         >
           {/* Title */}
@@ -60,13 +60,35 @@ export default async function Image() {
           </div>
         </div>
 
+        {/* Demo Image */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px 80px',
+            flex: 1,
+          }}
+        >
+          <img
+            src="https://raw.githubusercontent.com/Atomized-titan/pixel-graph/main/.github/assets/demo.png"
+            alt="Demo"
+            style={{
+              width: '600px',
+              height: 'auto',
+              borderRadius: '12px',
+              border: '2px solid #333',
+            }}
+          />
+        </div>
+
         {/* Bottom section with features */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '40px 80px 60px 80px',
+            padding: '20px 80px 40px 80px',
           }}
         >
           {/* Features */}
