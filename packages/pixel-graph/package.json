@@ -1,10 +1,37 @@
 {
-  "name": "@pixel-graph/react",
-  "version": "0.0.1",
+  "name": "pixel-graph-react",
+  "version": "0.1.0",
+  "description": "A beautiful, customizable pixelated area chart component for React",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "react",
+    "chart",
+    "graph",
+    "pixel",
+    "pixelated",
+    "area-chart",
+    "data-visualization",
+    "svg",
+    "typescript"
+  ],
+  "author": "Pushpal Ghoshal <pushpal_g@outlook.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Atomized-titan/pixel-graph.git",
+    "directory": "packages/pixel-graph"
+  },
+  "bugs": {
+    "url": "https://github.com/Atomized-titan/pixel-graph/issues"
+  },
+  "homepage": "https://github.com/Atomized-titan/pixel-graph#readme",
   "scripts": {
     "build": "tsup src/index.tsx --format cjs,esm --dts --external react,react-dom",
     "dev": "tsup src/index.tsx --format cjs,esm --dts --watch --external react,react-dom",
