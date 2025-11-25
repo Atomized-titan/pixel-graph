@@ -1,17 +1,17 @@
-# @pixel-graph/react
+# pixel-graph-react
 
 A beautiful, customizable pixelated area chart component for React.
 
 ## Installation
 
 ```bash
-npm install @pixel-graph/react
+npm install pixel-graph-react
 ```
 
 ## Usage
 
 ```tsx
-import { PixelGraph } from "@pixel-graph/react";
+import { PixelGraph } from "pixel-graph-react";
 
 const data = [
   { name: "JAN", value1: 40, value2: 24 },

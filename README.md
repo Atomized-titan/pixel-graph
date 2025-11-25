@@ -1,4 +1,4 @@
-# @pixel-graph/react
+# pixel-graph-react
 
 A beautiful, customizable pixelated area chart component for React. Create stunning data visualizations with a retro pixel aesthetic.
 
@@ -16,17 +16,17 @@ A beautiful, customizable pixelated area chart component for React. Create stunn
 ## Installation
 
 ```bash
-npm install @pixel-graph/react
+npm install pixel-graph-react
 # or
-yarn add @pixel-graph/react
+yarn add pixel-graph-react
 # or
-pnpm add @pixel-graph/react
+pnpm add pixel-graph-react
 ```
 
 ## Quick Start
 
 ```tsx
-import { PixelGraph } from "@pixel-graph/react";
+import { PixelGraph } from "pixel-graph-react";
 
 const data = [
   { name: "JAN", value1: 40, value2: 24 },
@@ -118,7 +118,7 @@ You can pass a `className` prop to add custom styles:
 The package includes TypeScript definitions. Import types as needed:
 
 ```tsx
-import { PixelGraph, PixelGraphProps } from "@pixel-graph/react";
+import { PixelGraph, PixelGraphProps } from "pixel-graph-react";
 ```
 
 ## Next.js Usage
@@ -131,7 +131,7 @@ For Next.js App Router, use dynamic import with `ssr: false`:
 import dynamic from "next/dynamic";
 
 const PixelGraph = dynamic(
-  () => import("@pixel-graph/react").then((mod) => ({ default: mod.PixelGraph })),
+  () => import("pixel-graph-react").then((mod) => ({ default: mod.PixelGraph })),
   { ssr: false }
 );
 
@@ -153,28 +153,26 @@ This package is part of a monorepo. To contribute:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pixel-graph.git
+git clone https://github.com/Atomized-titan/pixel-graph.git
 
 # Install dependencies
 pnpm install
 
 # Start development
-pnpm dev --filter @pixel-graph/react
+pnpm dev --filter pixel-graph-react
 
 # Build
-pnpm build --filter @pixel-graph/react
+pnpm build --filter pixel-graph-react
 ```
 
 ## License
 
-MIT © [Your Name]
+MIT © Pushpal Ghoshal
 
 ## Links
 
-- [Documentation](https://pixel-graph-docs.vercel.app)
-- [Storybook](https://pixel-graph-storybook.vercel.app)
-- [GitHub](https://github.com/yourusername/pixel-graph)
-- [NPM](https://www.npmjs.com/package/@pixel-graph/react)
+- [GitHub](https://github.com/Atomized-titan/pixel-graph)
+- [NPM](https://www.npmjs.com/package/pixel-graph-react)
 
 ## Support
 
