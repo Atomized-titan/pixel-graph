@@ -2,7 +2,7 @@
 
 A beautiful, customizable pixelated area chart component for React. Create stunning data visualizations with a retro pixel aesthetic.
 
-![Pixel Graph Example](https://via.placeholder.com/800x400/f5f5f5/000000?text=Pixel+Graph+Demo)
+![Pixel Graph Demo](.github/assets/demo.png)
 
 ## Features
 
